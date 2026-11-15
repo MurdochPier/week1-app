@@ -1,0 +1,30 @@
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  padding: 12px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+}
+
+.sidebar-title {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.page {
+  flex: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.empty-state {
+  color: var(--text-muted);
+}

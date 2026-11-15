@@ -1,0 +1,27 @@
+/* All colors are tokens so dark mode (feature 8) only swaps these values. */
+:root {
+  --bg: #ffffff;
+  --bg-sidebar: #f7f7f5;
+  --bg-hover: #ebebea;
+  --text: #37352f;
+  --text-muted: #787774;
+  --border: #e9e9e7;
+  --accent: #2383e2;
+
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
