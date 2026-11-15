@@ -5,6 +5,22 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Notes</title>
+    <script>
+      // Pick the theme before the page draws, so dark mode doesn't flash white on load.
+      // Mirrors loadThemeChoice + resolveTheme + applyTheme in src/lib/theme.ts — keep them in sync.
+      ;(function () {
+        var choice = 'system'
+        try {
+          choice = localStorage.getItem('week1-app:theme') || 'system'
+        } catch (e) {}
+        var dark =
+          choice === 'dark' ||
+          (choice !== 'light' &&
+            !!window.matchMedia &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

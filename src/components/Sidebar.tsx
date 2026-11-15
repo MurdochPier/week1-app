@@ -4,6 +4,7 @@ import { useApp } from '../state/useApp'
 import { addPage } from '../state/reducer'
 import PageTreeItem from './PageTreeItem'
 import SearchBox from './SearchBox'
+import ThemeToggle from './ThemeToggle'
 import './Sidebar.css'
 
 function Sidebar() {
@@ -14,7 +15,10 @@ function Sidebar() {
 
   return (
     <aside className="sidebar" aria-label="Sidebar">
-      <h1 className="sidebar-title">Notes</h1>
+      <div className="sidebar-header">
+        <h1 className="sidebar-title">Notes</h1>
+        <ThemeToggle />
+      </div>
       <SearchBox query={query} onQueryChange={setQuery} />
       <button type="button" className="new-page-button" onClick={() => dispatch(addPage())}>
         + New page
