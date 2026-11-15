@@ -59,7 +59,7 @@ describe('Sidebar', () => {
     await user.click(screen.getByRole('button', { name: '+ New page' }))
 
     expect(pageButton('Untitled')).toHaveAttribute('aria-current', 'page')
-    expect(within(screen.getByRole('main')).getByRole('heading', { name: 'Untitled' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Page title' })).toHaveValue('')
   })
 
   it('"+" adds a child that appears nested under its parent', async () => {
@@ -121,7 +121,7 @@ describe('Sidebar', () => {
 
     expect(pageButton('Meetings')).toHaveAttribute('aria-current', 'page')
     expect(pageButton('Work')).not.toHaveAttribute('aria-current')
-    expect(within(screen.getByRole('main')).getByRole('heading', { name: 'Meetings' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Page title' })).toHaveValue('Meetings')
   })
 
   it('collapse hides the children and expand shows them again', async () => {

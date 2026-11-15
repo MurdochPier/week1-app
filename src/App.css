@@ -10,15 +10,6 @@
   padding: 48px 24px;
 }
 
-.page-title {
-  margin: 0;
-  font-size: 40px;
-}
-
-.page-title.untitled {
-  color: var(--text-muted);
-}
-
 .empty-state {
   color: var(--text-muted);
 }

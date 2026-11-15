@@ -1,5 +1,5 @@
 import './App.css'
-import { UNTITLED } from './components/PageTreeItem'
+import PageView from './components/PageView'
 import Sidebar from './components/Sidebar'
 import { AppProvider } from './state/AppContext'
 import { useApp } from './state/useApp'
@@ -11,9 +11,8 @@ function MainArea() {
   return (
     <main className="page">
       {page ? (
-        <h2 className={page.title ? 'page-title' : 'page-title untitled'}>
-          {page.title || UNTITLED}
-        </h2>
+        // key: start fresh (refs, focus) when switching pages
+        <PageView key={page.id} page={page} />
       ) : (
         <p className="empty-state">Select or create a page to get started.</p>
       )}
