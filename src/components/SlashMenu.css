@@ -1,0 +1,34 @@
+.slash-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  width: 220px;
+  padding: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+.slash-menu-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.slash-menu-item {
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.slash-menu-item[aria-selected='true'] {
+  background: var(--bg-hover);
+}
+
+.slash-menu-empty {
+  margin: 0;
+  padding: 4px 8px;
+  color: var(--text-muted);
+}

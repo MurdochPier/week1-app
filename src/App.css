@@ -1,0 +1,15 @@
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.page {
+  flex: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.empty-state {
+  color: var(--text-muted);
+}

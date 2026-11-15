@@ -1,0 +1,144 @@
+.page-title-input {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 0;
+  font: inherit;
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--text);
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.page-title-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* A block row: drag handle on the left, then the block. */
+.sortable-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+  margin-left: -26px; /* hang the handle in the left margin so text lines up with the title */
+}
+
+.sortable-row.dragging {
+  position: relative;
+  z-index: 1;
+  opacity: 0.5;
+}
+
+.drag-handle {
+  width: 24px;
+  margin-top: 3px;
+  padding: 0;
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: -2px;
+  line-height: 22px;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-radius: 3px;
+  cursor: grab;
+  opacity: 0;
+  touch-action: none; /* let dnd-kit handle touch drags instead of the page scrolling */
+}
+
+.sortable-row:hover .drag-handle,
+.sortable-row.dragging .drag-handle,
+.drag-handle:focus-visible {
+  opacity: 1;
+}
+
+.drag-handle:hover {
+  background: var(--bg-hover);
+}
+
+.drag-handle:focus-visible {
+  outline: 2px solid var(--accent);
+}
+
+.sortable-row .block {
+  flex: 1;
+  min-width: 0;
+}
+
+.block {
+  position: relative; /* the slash menu sits just below its block */
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 2px 0;
+}
+
+.block-content {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  outline: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Placeholder: always for headings, only while focused for the rest. */
+.block-h1 .block-content:empty::before,
+.block-h2 .block-content:empty::before,
+.block-h3 .block-content:empty::before,
+.block-content:empty:focus::before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.block-h1 .block-content {
+  margin-top: 16px;
+  font-size: 30px;
+}
+
+.block-h2 .block-content {
+  margin-top: 12px;
+  font-size: 24px;
+}
+
+.block-h3 .block-content {
+  margin-top: 8px;
+  font-size: 20px;
+}
+
+.block-marker {
+  min-width: 20px;
+  text-align: right;
+  color: var(--text);
+  user-select: none;
+}
+
+.block-checkbox {
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.block-todo.checked .block-content {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.add-block-button {
+  margin-top: 8px;
+  padding: 4px 8px;
+  font: inherit;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-block-button:hover {
+  background: var(--bg-hover);
+}
+
+.add-block-button:focus-visible {
+  outline: 2px solid var(--accent);
+}

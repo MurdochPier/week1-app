@@ -1,0 +1,133 @@
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  padding: 12px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.sidebar-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.theme-toggle {
+  padding: 2px 6px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-hover);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+}
+
+.new-page-button,
+.tree-page-button,
+.tree-icon-button {
+  font: inherit;
+  color: var(--text);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.new-page-button {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: left;
+  color: var(--text-muted);
+}
+
+.new-page-button:hover {
+  background: var(--bg-hover);
+}
+
+.page-tree {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.page-tree .page-tree {
+  padding-left: 16px;
+}
+
+.tree-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: 4px;
+}
+
+.tree-row:hover,
+.tree-row.selected {
+  background: var(--bg-hover);
+}
+
+.tree-row.selected .tree-page-button {
+  font-weight: 600;
+}
+
+.tree-page-button {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 4px;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tree-icon-button,
+.tree-icon-spacer {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  padding: 0;
+  border-radius: 3px;
+  line-height: 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.tree-icon-button:hover {
+  background: var(--border);
+}
+
+/* Row actions only appear on hover or keyboard focus, but stay in the DOM. */
+.tree-actions {
+  display: flex;
+  opacity: 0;
+}
+
+.tree-row:hover .tree-actions,
+.tree-row:focus-within .tree-actions {
+  opacity: 1;
+}
+
+.tree-icon-button:focus-visible,
+.tree-page-button:focus-visible,
+.new-page-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
