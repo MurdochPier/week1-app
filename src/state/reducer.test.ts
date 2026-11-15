@@ -262,3 +262,47 @@ describe('reducer: blocks', () => {
     expect(newBlock()).not.toHaveProperty('checked')
   })
 })
+
+describe('reducer: moveBlock', () => {
+  const block = (id: string): Block => ({ id, type: 'text', text: id })
+
+  function pageWith(...blockIds: string[]): AppState {
+    const state = run(initialState, add('p', null, 0))
+    return { ...state, pages: { p: { ...state.pages.p, blocks: blockIds.map(block) } } }
+  }
+
+  const move = (state: AppState, from: number, to: number, pageId = 'p') =>
+    reducer(state, { type: 'moveBlock', pageId, from, to, now: 77 })
+
+  const ids = (state: AppState) => state.pages.p.blocks.map((b) => b.id)
+
+  it('moves a block down', () => {
+    expect(ids(move(pageWith('a', 'b', 'c', 'd'), 0, 2))).toEqual(['b', 'c', 'a', 'd'])
+  })
+
+  it('moves a block up', () => {
+    expect(ids(move(pageWith('a', 'b', 'c', 'd'), 3, 1))).toEqual(['a', 'd', 'b', 'c'])
+  })
+
+  it('moves a block to the first and last position', () => {
+    expect(ids(move(pageWith('a', 'b', 'c'), 2, 0))).toEqual(['c', 'a', 'b'])
+    expect(ids(move(pageWith('a', 'b', 'c'), 0, 2))).toEqual(['b', 'c', 'a'])
+  })
+
+  it('bumps updatedAt when a block moves', () => {
+    expect(move(pageWith('a', 'b'), 0, 1).pages.p.updatedAt).toBe(77)
+  })
+
+  it('dropping in the same spot leaves the state unchanged', () => {
+    const state = pageWith('a', 'b', 'c')
+    expect(move(state, 1, 1)).toBe(state)
+  })
+
+  it('bad indexes or an unknown page leave the state unchanged', () => {
+    const state = pageWith('a', 'b', 'c')
+    expect(move(state, -1, 0)).toBe(state)
+    expect(move(state, 0, 3)).toBe(state)
+    expect(move(state, 1.5, 0)).toBe(state)
+    expect(move(state, 0, 1, 'nope')).toBe(state)
+  })
+})

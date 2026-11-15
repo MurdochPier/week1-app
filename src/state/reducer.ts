@@ -19,6 +19,7 @@ export type AppAction =
       now: number
     }
   | { type: 'toggleTodo'; pageId: string; blockId: string; now: number }
+  | { type: 'moveBlock'; pageId: string; from: number; to: number; now: number }
 
 // Action creators: these generate ids and timestamps so the reducer itself stays pure.
 export const addPage = (parentId: string | null = null): AppAction => ({
@@ -78,6 +79,15 @@ export const toggleTodo = (pageId: string, blockId: string): AppAction => ({
   type: 'toggleTodo',
   pageId,
   blockId,
+  now: Date.now(),
+})
+
+/** Moves the block at index `from` to index `to` (for drag-and-drop). */
+export const moveBlock = (pageId: string, from: number, to: number): AppAction => ({
+  type: 'moveBlock',
+  pageId,
+  from,
+  to,
   now: Date.now(),
 })
 
@@ -185,5 +195,16 @@ export function reducer(state: AppState, action: AppAction): AppState {
       return withBlocks(state, action.pageId, action.now, (blocks) =>
         mapBlock(blocks, action.blockId, (b) => ({ ...b, checked: !b.checked })),
       )
+
+    case 'moveBlock':
+      return withBlocks(state, action.pageId, action.now, (blocks) => {
+        const { from, to } = action
+        const inRange = (i: number) => Number.isInteger(i) && i >= 0 && i < blocks.length
+        if (from === to || !inRange(from) || !inRange(to)) return null
+        const moved = [...blocks]
+        const [block] = moved.splice(from, 1)
+        moved.splice(to, 0, block)
+        return moved
+      })
   }
 }

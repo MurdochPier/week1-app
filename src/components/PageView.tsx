@@ -1,3 +1,17 @@
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import type { Announcements, DragEndEvent, Modifier, UniqueIdentifier } from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
 import { useLayoutEffect, useRef } from 'react'
 import type { KeyboardEvent } from 'react'
 import { LIST_TYPES, listNumbers } from '../lib/blocks'
@@ -6,6 +20,7 @@ import {
   addBlock,
   changeBlockType,
   deleteBlock,
+  moveBlock,
   newBlock,
   renamePage,
   toggleTodo,
@@ -13,8 +28,8 @@ import {
 } from '../state/reducer'
 import { useApp } from '../state/useApp'
 import type { Block as BlockData, Page } from '../types'
-import Block from './Block'
 import { UNTITLED } from './PageTreeItem'
+import SortableBlock from './SortableBlock'
 import './PageView.css'
 
 interface FocusRequest {
@@ -22,11 +37,50 @@ interface FocusRequest {
   where: 'start' | 'end'
 }
 
+/** Blocks only move up and down, never sideways. */
+const verticalOnly: Modifier = ({ transform }) => ({ ...transform, x: 0 })
+
+const screenReaderInstructions = {
+  draggable:
+    'To pick up a block, press Space or Enter. Use the up and down arrow keys to move it. ' +
+    'Press Space or Enter again to drop it, or Escape to cancel.',
+}
+
 function PageView({ page }: { page: Page }) {
   const { dispatch } = useApp()
   const blocksRef = useRef<HTMLDivElement>(null)
   const pendingFocus = useRef<FocusRequest | null>(null)
   const numbers = listNumbers(page.blocks)
+  const blockIds = page.blocks.map((b) => b.id)
+
+  // Pointer: the mouse must move 5px before a drag starts, so a plain click on the handle isn't a drag.
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return
+    dispatch(
+      moveBlock(page.id, blockIds.indexOf(String(active.id)), blockIds.indexOf(String(over.id))),
+    )
+  }
+
+  // What screen readers say during a drag (dnd-kit's default would read out the random block ids).
+  const total = page.blocks.length
+  const position = (id: UniqueIdentifier) => blockIds.indexOf(String(id)) + 1
+  const announcements: Announcements = {
+    onDragStart: ({ active }) => `Picked up block ${position(active.id)} of ${total}.`,
+    onDragOver: ({ active, over }) =>
+      over
+        ? `Block ${position(active.id)} is over position ${position(over.id)} of ${total}.`
+        : `Block ${position(active.id)} is no longer over a drop position.`,
+    onDragEnd: ({ active, over }) =>
+      over
+        ? `Block ${position(active.id)} was dropped at position ${position(over.id)} of ${total}.`
+        : `Block ${position(active.id)} was dropped.`,
+    onDragCancel: ({ active }) => `Moving cancelled. Block ${position(active.id)} was put back.`,
+  }
 
   /** The editable element of a block, found by its data-block-id. */
   const editableFor = (id: string) =>
@@ -88,24 +142,34 @@ function PageView({ page }: { page: Page }) {
         onChange={(e) => dispatch(renamePage(page.id, e.target.value))}
         onKeyDown={handleTitleKeyDown}
       />
-      <div className="blocks" ref={blocksRef}>
-        {page.blocks.map((block, index) => (
-          <Block
-            key={block.id}
-            block={block}
-            number={numbers[index]}
-            onChange={(text) => dispatch(updateBlock(page.id, block.id, text))}
-            onSplit={(offset) => handleSplit(block, offset)}
-            onDeleteEmpty={() => handleDeleteEmpty(index)}
-            onChangeType={(type) => {
-              dispatch(changeBlockType(page.id, block.id, type))
-              // A heading uses a different element (<h1> vs <p>), so put the cursor back.
-              pendingFocus.current = { id: block.id, where: 'end' }
-            }}
-            onToggle={() => dispatch(toggleTodo(page.id, block.id))}
-          />
-        ))}
-      </div>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        modifiers={[verticalOnly]}
+        onDragEnd={handleDragEnd}
+        accessibility={{ announcements, screenReaderInstructions }}
+      >
+        <SortableContext items={blockIds} strategy={verticalListSortingStrategy}>
+          <div className="blocks" ref={blocksRef}>
+            {page.blocks.map((block, index) => (
+              <SortableBlock
+                key={block.id}
+                block={block}
+                number={numbers[index]}
+                onChange={(text) => dispatch(updateBlock(page.id, block.id, text))}
+                onSplit={(offset) => handleSplit(block, offset)}
+                onDeleteEmpty={() => handleDeleteEmpty(index)}
+                onChangeType={(type) => {
+                  dispatch(changeBlockType(page.id, block.id, type))
+                  // A heading uses a different element (<h1> vs <p>), so put the cursor back.
+                  pendingFocus.current = { id: block.id, where: 'end' }
+                }}
+                onToggle={() => dispatch(toggleTodo(page.id, block.id))}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
       <button
         type="button"
         className="add-block-button"

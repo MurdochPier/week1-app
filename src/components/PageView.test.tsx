@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import App from '../App'
 import { saveState } from '../storage/storage'
 import type { AppState, Block } from '../types'
@@ -137,6 +137,82 @@ describe('PageView', () => {
     await user.click(screen.getByRole('checkbox', { name: 'Milk' }))
 
     expect(screen.getByRole('checkbox', { name: 'Milk' })).toBeChecked()
+  })
+
+  describe('drag and drop (keyboard)', () => {
+    const threeBlocks = () => stateWith([text('a', 'first'), text('b', 'second'), text('c', 'third')])
+    const handles = () => screen.getAllByRole('button', { name: 'Drag to move block' })
+
+    /**
+     * jsdom has no layout: every element measures 0×0, so dnd-kit can't tell which block is below which.
+     * Pretend each block row is 40px tall and stacked in DOM order.
+     */
+    function mockRowLayout() {
+      vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (
+        this: Element,
+      ) {
+        const row = this.closest('.sortable-row')
+        const index = row ? Array.from(row.parentElement!.children).indexOf(row) : 0
+        const top = row ? index * 40 : 0
+        const height = row ? 40 : 0
+        const width = row ? 600 : 0
+        return {
+          x: 0,
+          y: top,
+          top,
+          left: 0,
+          width,
+          height,
+          right: width,
+          bottom: top + height,
+          toJSON: () => ({}),
+        } as DOMRect
+      })
+    }
+
+    it('every block has a drag handle', () => {
+      setup(threeBlocks())
+      expect(handles()).toHaveLength(3)
+    })
+
+    it('Space, ArrowDown, Space moves a block down one place', async () => {
+      mockRowLayout()
+      const { user } = setup(threeBlocks())
+
+      handles()[0].focus()
+      await user.keyboard(' ')
+      await user.keyboard('{ArrowDown}')
+      await user.keyboard(' ')
+
+      expect(blockTexts()).toEqual(['second', 'first', 'third'])
+    })
+
+    it('a block can be moved up, and the new order is saved', async () => {
+      mockRowLayout()
+      const { user, unmount } = setup(threeBlocks())
+
+      handles()[2].focus()
+      await user.keyboard(' ')
+      await user.keyboard('{ArrowUp}{ArrowUp}')
+      await user.keyboard(' ')
+      expect(blockTexts()).toEqual(['third', 'first', 'second'])
+
+      unmount()
+      render(<App />)
+      expect(blockTexts()).toEqual(['third', 'first', 'second'])
+    })
+
+    it('Escape cancels the drag and keeps the order', async () => {
+      mockRowLayout()
+      const { user } = setup(threeBlocks())
+
+      handles()[0].focus()
+      await user.keyboard(' ')
+      await user.keyboard('{ArrowDown}')
+      await user.keyboard('{Escape}')
+
+      expect(blockTexts()).toEqual(['first', 'second', 'third'])
+    })
   })
 
   it('blocks still show after a reload', async () => {
