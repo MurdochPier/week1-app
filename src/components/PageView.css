@@ -16,6 +16,7 @@
 }
 
 .block {
+  position: relative; /* the slash menu sits just below its block */
   display: flex;
   align-items: baseline;
   gap: 6px;

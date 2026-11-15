@@ -97,7 +97,11 @@ function PageView({ page }: { page: Page }) {
             onChange={(text) => dispatch(updateBlock(page.id, block.id, text))}
             onSplit={(offset) => handleSplit(block, offset)}
             onDeleteEmpty={() => handleDeleteEmpty(index)}
-            onChangeType={(type) => dispatch(changeBlockType(page.id, block.id, type))}
+            onChangeType={(type) => {
+              dispatch(changeBlockType(page.id, block.id, type))
+              // A heading uses a different element (<h1> vs <p>), so put the cursor back.
+              pendingFocus.current = { id: block.id, where: 'end' }
+            }}
             onToggle={() => dispatch(toggleTodo(page.id, block.id))}
           />
         ))}
